@@ -17,6 +17,6 @@ well known libraries like qurobi library and Argonne Optimization Server, and da
 
 
 
-_Electrical and Computer Engineering Dept._
+_Electrical and Computer Engineering Dept, University Of Thessaly._
 
-_Volos, Greece, 2016-17._
+_Volos, Greece, 2017-18._
