@@ -1,32 +1,39 @@
-college = read.csv(file = "College.csv")
-fix(college) # First column is just the name of each university, might be useful later
+# Lab1 Intro to R
 
-rownames(college) = college[,1] # Take first col of each row and assign it to rownames(college)
+# read .csv
+college = read.csv("College.csv")
+
+# get college names
+rownames(college) = college[,1]
 fix(college)
 
-college =  college[,-1] # Eliminate first column
+# eliminate the first column
+college = college[,-1]
 fix(college)
-# Now, our sheet's first column is the name of each university, data not to be processed,
-# and all other columns are data.
 
-summary(college); # Display numerical summary of variables in college
-pairs(college[,1:10]) # Scatter plot
-plot(college$Outstate,college$Private) # To refer to a variable, we must type 'dataSet$variableName'
+# produce a numerical summary of the variables in the data set
+summary(college)
 
-Elite = rep("No", times = nrow(college)) # Init every uni to a 'no' (it is not elite)
-Elite[college$Top10perc > 50] = "Yes" # If top 10% from high school classes > 50 % college, then it's an elite uni.
+# A scatterplot matrix of the first ten columns or variables of the data
+# A scatterplot graph gives correlation between data!
+pairs(college[,1:10])
+
+# side-by-side boxplots of Outstate versus Private
+boxplot(college$Outstate~college$Private)
+
+# create a qualitative variable!
+Elite = rep("No", nrow(college))
+Elite[college$Top10perc > 50] = "Yes"
 Elite = as.factor(Elite)
-college = data.frame(college, Elite) # A data frame is a tighly coupled collection of variables which share same properties
+college = data.frame(college,Elite)
 
-summary(Elite) # See how many elite universities there are
-plot(x = college$Outstate, y = Elite)
+# how many elite univer-sities there are.
+summary(college$Elite)
+boxplot(college$Outstate~college$Elite)
 
-# Produce histograms of quantitative variables
-op = par(mfrow = c(2,2)) # Divide print window into 4 regions
+# some histograms
+par(mfrow = c(2,2))
+hist(college$Room.Board)
+hist(college$Books)
+hist(college$Personal)
 hist(college$Outstate)
-hist(college$Top10perc)
-hist(college$Apps)
-hist(college$Top25perc)
-
-
-
