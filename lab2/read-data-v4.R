@@ -83,8 +83,42 @@ fp00.dat <- extract_data("Fp2000")
 int06.dat <- extract_data("Int2006")
 fp06.dat <- extract_data("Fp2006")
 
+# Copy and Paste code from pdf file
 
+# Access data frame
+int92.dat[15, 12]
+int92.dat["71","perf"]
+int92.dat[,"clock"]
+int92.dat[36,]
 
+# number of rows and cols
+nrow(int92.dat)
+ncol(int92.dat)
 
+# Some built-in functions
+min(int92.dat[,"perf"])
+max(int92.dat[,"perf"])
+mean(int92.dat[,"perf"])
+sd(int92.dat[,"perf"])
 
+# Using $ to refer to a column
+min(int92.dat$perf)
+max(int92.dat$perf)
+mean(int92.dat$perf)
+sd(int92.dat$perf)
 
+# Or use attach!
+# This function makes the corresponding data frame local to the current workspace
+attach(int92.dat)
+min(perf)
+max(perf)
+mean(perf)
+sd(perf)
+
+# Change to different data frame 
+detach(int92.dat)
+attach(fp00.dat)
+min(perf)
+max(perf)
+mean(perf)
+sd(perf)
