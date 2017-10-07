@@ -1,8 +1,10 @@
 ---
 title: "2 | Understand Your Data"
-output: html_document # exports to html, pdf or whatever the output is!
+output:
+  html_document: default
+  pdf_document:
+    latex_engine: xelatex
 ---
-
 ```{r echo=FALSE}
 # If we don't want a chunk to be visible in the output, just insert 'echo = false'
 # For example, we don't want any output of this chunk in our html or pdf document, but this chunk is necessary to run first
