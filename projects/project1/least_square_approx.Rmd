@@ -1,0 +1,22 @@
+---
+title: "Least Squares Approximation"
+output: html_notebook
+---
+
+
+
+```{r}
+library("MASS")
+data = read.table("data.txt")
+data = as.matrix(data)
+```
+
+# Least Square Approx
+```{r}
+x = as.matrix(data[,1])
+y = as.matrix(data[,2])
+phi = matrix(c(x^0,x^1), nrow=dim(data)[1], ncol=dim(data)[2])
+w = ginv(phi)%*%y
+plot(x,y)
+lines(x,phi%*%w,col="green")
+```
