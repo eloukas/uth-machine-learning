@@ -34,14 +34,19 @@ r = 1 - (SSres/SStot)
 
 # Cross-validation
 ```{r}
-library("MASS")
 fold = 8
 dimension_row = dim(data)[1]
-n = dim(data)[1]/fold
-tmp = runif(dimension_row,1,dimension_row)
+n = dim(data)[1]/fold # divide into groups
+
+# random distribution of numbers
+tmp = runif(dimension_row,1,dimension_row) 
 I = order(tmp)
 
+# init MSE matrix
+MSE = matrix(0, fold,1)
 group_start = 1
+
+# cross validation!
 for (i in 1:fold){
   group_end = i*n
   test_set_indices = I[group_start:group_end]
@@ -69,5 +74,5 @@ for (i in 1:fold){
   MSE[i] =   sum((y_test-y_test_predicted)^2)/length(y_test)
   group_start = group_end + 1
 }
-hist(MSE)
+barplot(MSE, beside = TRUE, names.arg = 1:dim(MSE)[1])
 ```
