@@ -29,13 +29,19 @@ data = as.matrix(data) # Read data.txt as matrix
 
 nrows = as.matrix(dim(data)[1]) 
 
-# tmp = as.matrix(rnorm(nrows)) # Get 168(nrows) random numbers & assign it to tmp
+tmp = as.matrix(rnorm(nrows)) # Get 168(nrows) random numbers & assign it to tmp
+Y = sort(tmp) 
+I = order(tmp)
+
+dimensions = dim(data)
+test_set_indices = I[1:floor(dimensions*0.2)] # Put dimensions[1] to remove the warning
+training_set_indices = setdiff(I,test_set_indices)
 
 numberOfTestPoints = floor(nrows*0.2)
 numberOfTrainingPoints = nrows - numberOfTestPoints
 
-test_set_indices= 1:numberOfTestPoints  # First 20% indices are for testing
-training_set_indices = (ceiling(numberOfTestPoints)+1):nrows # Remaining 80% indices are for training
+#test_set_indices= 1:numberOfTestPoints  # First 20% indices are for testing
+#training_set_indices = (ceiling(numberOfTestPoints)+1):nrows # Remaining 80% indices are for training
 
 test_set = data[test_set_indices,] # Take the training & test data
 training_set=data[training_set_indices,]
@@ -58,6 +64,11 @@ y_test_predicted = phi_test%*%w # Find the estimates of y_test
 
 plot(x_test,y_test)
 par(new=TRUE) # hold on;
-plot(x_test,y_test_predicted,col="green")
+lines(x_test,y_test_predicted,col="green")
 par(new=FALSE) # hold off;
+
+sum((y_test-y_test_predicted)^2)/length(y_test)
+
+sum((y_train - phi_train%*%w)^2)/length(y_train)
+
 ```
