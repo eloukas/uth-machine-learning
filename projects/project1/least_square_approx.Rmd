@@ -56,5 +56,8 @@ w = ginv(phi_train)%*%y_train
 phi_test = matrix(c(x_test^0,x_test^1), nrow = numberOfTestPoints , ncol = 2) 
 y_test_predicted = phi_test%*%w # Find the estimates of y_test
 
-
+plot(x_test,y_test)
+par(new=TRUE) # hold on;
+plot(x_test,y_test_predicted,col="green")
+par(new=FALSE) # hold off;
 ```
