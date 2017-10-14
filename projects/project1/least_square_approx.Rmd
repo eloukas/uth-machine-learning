@@ -11,7 +11,8 @@ data = read.table("data.txt")
 data = as.matrix(data)
 ```
 
-# Least Square Approx
+# Exercise 1
+# Least Square Approximation
 ```{r}
 x = as.matrix(data[,1])
 y = as.matrix(data[,2])
@@ -34,6 +35,7 @@ r = 1 - (SSres/SStot)
 ```
 
 # Exercise 2
+# Generalization and Visualization
 ```{r}
 library("MASS")
 data = read.table("data.txt")
@@ -83,7 +85,7 @@ sum((y_test-y_test_predicted)^2)/length(y_test)
 
 sum((y_train - phi_train%*%w)^2)/length(y_train)
 ```
-
+# Exercise 3
 # Cross-validation
 ```{r}
 fold = 8
@@ -130,4 +132,8 @@ barplot(MSE, beside = TRUE, names.arg = 1:dim(MSE)[1])
 
 lines(x,phi%*%w,col="green")
 ```
+# Exercise 4:
+# Recursive Least-Squares
+```{r}
 
+```
