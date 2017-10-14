@@ -18,5 +18,15 @@ y = as.matrix(data[,2])
 phi = matrix(c(x^0,x^1), nrow=dim(data)[1], ncol=dim(data)[2])
 w = ginv(phi)%*%y
 plot(x,y)
-lines(x,phi%*%w,col="green")
+y_new = phi%*%w
+lines(x,y_new,col="green")
+```
+
+# Square Test
+```{r}
+y_mean = mean(y)
+x_mean = mean(x)
+
+numerator = sum((x-x_mean)*(y_new-y_mean))
+denominator = 
 ```
