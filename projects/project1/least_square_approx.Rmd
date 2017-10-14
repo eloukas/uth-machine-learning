@@ -31,14 +31,3 @@ SStot = sum((y-y_mean)**2)
 SSres = sum((y-y_approx)**2)
 r = 1 - (SSres/SStot)
 ```
-
-# Cross-validation
-```{r}
-fold = 8
-indexes = as.matrix(order(x))
-n = dim(x)[1]/fold
-
-for (i in 1:8){
-  test_set_x = x[indexes[(i-1)*n+1:i*n]]
-}
-```
