@@ -20,3 +20,41 @@ w = ginv(phi)%*%y
 plot(x,y)
 lines(x,phi%*%w,col="green")
 ```
+
+# Exercise 2
+```{r}
+library("MASS")
+data = read.table("data.txt")
+data = as.matrix(data) # Read data.txt as matrix
+
+nrows = as.matrix(dim(data)[1]) 
+
+# tmp = as.matrix(rnorm(nrows)) # Get 168(nrows) random numbers & assign it to tmp
+
+numberOfTestPoints = floor(nrows*0.2)
+numberOfTrainingPoints = nrows - numberOfTestPoints
+
+test_set_indices= 1:numberOfTestPoints  # First 20% indices are for testing
+training_set_indices = (ceiling(numberOfTestPoints)+1):nrows # Remaining 80% indices are for training
+
+test_set = data[test_set_indices,] # Take the training & test data
+training_set=data[training_set_indices,]
+
+x_test = test_set[,1]
+y_test = test_set[,2]
+
+x_train = training_set[,1]
+y_train = training_set[,2]
+
+phi_train = matrix(c(x_train^0,x_train^1), nrow = numberOfTrainingPoints , ncol = 2) # Do the regression
+w = ginv(phi_train)%*%y_train
+
+# Now we have learned the weights from the training data.
+# We need to determine how well these learned weights work for
+# the unseen test set points.
+
+phi_test = matrix(c(x_test^0,x_test^1), nrow = numberOfTestPoints , ncol = 2) 
+y_test_predicted = phi_test%*%w # Find the estimates of y_test
+
+
+```
