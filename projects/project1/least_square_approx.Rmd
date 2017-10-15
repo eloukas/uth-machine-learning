@@ -322,6 +322,9 @@ observations generates future points, the parameters we learned from the trainin
 will allow us to make good predictions of the targets (the unobserved values; the y's)
 from the features (the observed values; the x's).
 
+#### Discussion of results : 
+In the console, we can see that the MSE for test points and the training points is **huge**. The smaller the mean-squared-error, the closer we are to finding the line of best fit with the use of Least Squares Approximation. This verifies once again that our data set input is not that good. 
+
 ```{r}
 source("generalization.R", local=environment())
 ```
