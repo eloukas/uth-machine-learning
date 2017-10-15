@@ -214,6 +214,9 @@ dimensions = dim(data)
 ```{r}
 source("least_square_algorithm.R", local=environment())
 ```
+
+#### Discussion of results :
+
 By watching the plot above, we can see that the single linear regression of the least squares numerical method *does not give us such a good approximation* for this kind of data.
 Specifically, watching the green line, we can see that it is close to 3 or 4 points of data, while the majority of them is definitely out of the way.
 **Reminder**: This does not mean that the method is not good for regression. The approximation depends heavily on the data input. (Remember 'garbabe in, garbage out'?)
@@ -453,6 +456,15 @@ increases.
 ```{r}
 source("cross_validation.R", local=environment())
 ```
+
+#### Discussion of results :
+We got our data set. We are going to split it to 8(n=8) equal-sized groups.
+Each time we are going to keep the group i to be the test set, and the remaining 7(n-1) groups to be the training set.
+Then, we are going to train the model and evaluate it for each group.
+This is going to happen for 8 times-8 folds.
+By watching the result of the plot, we can understand that group number 2 and group number 8 are the 'worst' sets since they have the biggest MSEs
+(Reminder: Definition of MSE in the previous exercise)
+With the same way, we can see that group number 7 gives us the best results for our model to be trained, then group no.1, etc.
 
 In many data analysis tasks data are not available all at once but arrive sequentially.
 Think for example to data collected from sensors, financial time series or adaptive
