@@ -214,6 +214,11 @@ dimensions = dim(data)
 ```{r}
 source("least_square_algorithm.R", local=environment())
 ```
+By watching the plot above, we can see that the single linear regression of the least squares numerical method *does not give us such a good approximation* for this kind of data.
+Specifically, watching the green line, we can see that it is close to 3 or 4 points of data, while the majority of them is definitely out of the way.
+**Reminder**: This does not mean that the method is not good for regression. The approximation depends heavily on the data input. (Remember 'garbabe in, garbage out'?)
+This also can be verified by seeing the value of the R-Square test.
+The 'r' value is *very* close to zero(0) , meaning the the variables do not relate so much to each other.
 
 # Square Test
 ```{r}
