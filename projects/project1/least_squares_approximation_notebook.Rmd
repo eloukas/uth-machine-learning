@@ -1,6 +1,8 @@
 ---
 title: "Least Squares Approximation"
 output:
+  pdf_document: 
+    latex_engine: xelatex
   html_document:
     df_print: paged
 ---
@@ -520,6 +522,13 @@ for (i in 1:N){
 ```{r}
 source("./scripts/rls.R", local=environment())
 ```
+
+### Discussion of Exercise #4:
+With the red line, we see the regression of the least squares to the 80% of the data. We take this data from exercise 2 since we already trained our model with these variables.
+We can define our 'P' matrix since we know the Ax=b solution(t in this chunk)
+(See script for details)
+For the remaining 20% of the dataset, we can use the already defined test set of exercise#2 in our Recursive Least Squares method. If you see the script, RLS takes the data from this minor data set one-by-one , defining our final estimation of the (recursive) least squares numerical method.
+Our final estimation can be seen visually as the blue line in the above plot.
 
 **Appendix A: Matrix Algebra in R**
 
