@@ -2,7 +2,6 @@
 ##
 #rm(list=ls()) # Uncomment if you want clean Global Environment
 library("knitr") # Package 'knitr' must be installed
-par(ask=TRUE)
 n<-1;
 
 # RLS function
@@ -24,19 +23,27 @@ rls<-function(x,y,t,P,mu=1){
   
 }
 
-X = as.matrix(data[,1])
+# 20% of dataset from exercise 2
+X <- x_test_rls 
+y <- y_test_rls
+
+# solution from exercise 2
+t <- w_rls
+
 N<-length(X)
-y = as.matrix(data[,2])
-t<-numeric(2)
-P<-500*diag(n+1)
+P<-solve(t(x_train_rls)%*%x_train_rls)[1]*diag(n+1) # inverse of A transpose * A, where A=training_set!
 mu<-0.9
+
+plot(x_train_rls, y_train_rls,main="Least Square with 80%",xlab="x",ylab="y")
+phi = matrix(c(x_train_rls^0,x_train_rls^1), nrow = dimensions-N , ncol = 2) 
+lines(x_train_rls,phi%*%w_rls,col="red")
 
 for (i in 1:N){ # Package 'knitr' must be installed?!
   rls.step<-rls(c(1, X[i]),y[i],t,P,mu)
   t<-rls.step[[1]]
   P<-rls.step[[2]]
-  
-  plot(X[1:i],y[1:i],main=paste("Forgetting factor mu<-",mu)) # Push 'escape' to get out of the plot loop
-  
-  lines(X[1:i],cbind(array(1,c(i,1)), X[1:i])%*%t,col="red")
 }
+
+plot(x_train_rls, y_train_rls,main=paste("Forgetting factor mu<-",mu),xlab="x",ylab="y")
+points(X[1:i],y[1:i],col = "blue") # Push 'escape' to get out of the plot loop
+lines(X[1:i],cbind(array(1,c(i,1)), X[1:i])%*%t,col="blue")

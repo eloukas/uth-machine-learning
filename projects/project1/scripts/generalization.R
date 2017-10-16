@@ -16,6 +16,7 @@ y_test = test_set[,2]
 x_train = training_set[,1]
 y_train = training_set[,2]
 
+# variables for exercise 4
 x_train_rls = x_train
 y_train_rls = y_train
 x_test_rls = x_test 
@@ -23,6 +24,7 @@ y_test_rls = y_test
 
 phi_train = matrix(c(x_train^0,x_train^1), nrow = numberOfTrainingPoints , ncol = 2) # Do the regression
 w = ginv(phi_train)%*%y_train
+w_rls = w # for exercise 4
 
 # Now we have learned the weights from the training data.
 # We need to determine how well these learned weights work for
