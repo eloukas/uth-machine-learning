@@ -87,7 +87,7 @@ to data that appears to have a linear relationship. Consider the following data:
 
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Plot of the above data
 
- ![](./plot1.png) 
+ ![](./images/plot1.png) 
  
 Visual inspection indicates that the relationship between the inputs (x-axis) and theoutputs (y-axis) is linear. So, we want to find a function in the form of a line that fits
 the data:
@@ -189,7 +189,7 @@ w =
 1.9975
 ```
 
-![](./plot2.png) 
+![](./images/plot2.png) 
 
 ### 2. R square test
 
@@ -212,7 +212,7 @@ dimensions = dim(data)
 
 **Exercise 1: Write an R script to implement the above method and run it for the data given. Apply the R square test and discuss the goodness of the approximation.**
 ```{r}
-source("least_square_algorithm.R", local=environment())
+source("./scripts/least_square_algorithm.R", local=environment())
 ```
 
 #### Discussion of results :
@@ -225,7 +225,7 @@ The 'r' value is *very* close to zero(0) , meaning the the variables do not rela
 
 # Square Test
 ```{r}
-source("multiple_Rsquare.R", local=environment())
+source("./scripts/multiple_Rsquare.R", local=environment())
 ```
 ## 3. Linear Regression and Data Mining Problems
 ## 3.1 The Approach to Data Mining Problems
@@ -298,7 +298,7 @@ hold on;
 plot(x_test(I),y_test_predicted(I),'g');
 ```
 
-![](./plot3.png) 
+![](./images/plot3.png) 
 
 
 By inspection, the fit on the test points appears to be quite good. We can compute
@@ -329,7 +329,7 @@ from the features (the observed values; the x's).
 In the console, we can see that the MSE for test points and the training points is **huge**. The smaller the mean-squared-error, the closer we are to finding the line of best fit with the use of Least Squares Approximation. This verifies once again that our data set input is not that good. 
 
 ```{r}
-source("generalization.R", local=environment())
+source("./scripts/generalization.R", local=environment())
 ```
 
 **3.3. Cross-validation** provides a framework for creating several train/test splits and
@@ -443,7 +443,7 @@ ans =
 bar(MSE);
 ```
 
-![](./plot4.png) 
+![](./images/plot4.png) 
 
 Note that for this data set, the variance among folds is fairly high. This is because
 the data set is small - only 30 points. Each fold is evaluated on a test set of size 3,
@@ -454,7 +454,7 @@ increases.
 **Exercise 3: Implement the cross-validation methodology in R for the given data.**
 **3. Recursive Least Squares**
 ```{r}
-source("cross_validation.R", local=environment())
+source("./scripts/cross_validation.R", local=environment())
 ```
 
 #### Discussion of results :
