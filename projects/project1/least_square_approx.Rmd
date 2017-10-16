@@ -221,7 +221,7 @@ By watching the plot above, we can see that the single linear regression of the 
 Specifically, watching the green line, we can see that it is close to 3 or 4 points of data, while the majority of them is definitely out of the way.
 **Reminder**: This does not mean that the method is not good for regression. The approximation depends heavily on the data input. (Remember 'garbabe in, garbage out'?)
 This also can be verified by seeing the value of the R-Square test.
-The 'r' value is *very* close to zero(0) , meaning the the variables do not relate so much to each other.
+The 'r' value is *very* close to zero(0) , meaning that the variables do not relate so much to each other.
 
 # Square Test
 ```{r}
@@ -521,7 +521,9 @@ for (i in 1:N){
 source("./scripts/rls.R", local=environment())
 ```
 
-*Appendix A: Matrix Algebra in R*
+**Appendix A: Matrix Algebra in R**
+
+
 Most of the methods on this website actually describe the programming of matrices. It
 is built deeply into the R language. This section will simply cover operators and
 functions specifically suited to linear algebra. Before proceeding you many want to
