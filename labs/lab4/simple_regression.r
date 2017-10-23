@@ -95,17 +95,16 @@ summary(fit.ex3)$coef
 # A common feature of time series data is a trend. Using regression we can model and
 # forecast the trend in time series data by including  t=1,…,T,t=1,…,T,  as a predictor variable:
 # y_t = β_0 + β_1*t + ε_t
+library('forecast')
 
 
-#library(forecast)
-#library(ggplot2)
+y=ts(data1[15], frequency = 5) # Take column No.11-size for each video- and make it a Time-Series object
+fit.ex4 <- tslm(y ~ trend) # Do Linear Modeling Fit for y ~ trend
+f <- forecast(fit.ex4, h=5,level=c(80,95)) # And do the forecast
+plot(f, ylab="Size of video", xlab="t")
 
-#fit.ex4 <- tslm(data1$size~ trend)
-#f <- forecast(fit.ex4, h=5,level=c(80,95))
-#plot(f, ylab="Size of video", xlab="t")
-
-#lines(fitted(fit.ex4),col="blue")
-#summary(fit.ex4)$coef
+lines(fitted(fit.ex4),col="blue")
+summary(fit.ex4)$coef
 
 ## Residual autocorrelation
 
@@ -117,7 +116,19 @@ abline(0,0)
 acf(res3) # autocorrelation function for the model res3 (utime residuals)
 
 ## Same thing for 'fit.ex4' variable 
-#res4 <- resid(fit.ex4)
-#plot(res4,ylab="res (size)")
-#abline(0,0)
-#acf(res4)
+res4 <- resid(fit.ex4)
+plot(res4,ylab="res (size)")
+abline(0,0)
+acf(res4)
+
+#################################################
+par(mfrow=c(2,2))
+res3 <- ts(resid(fit.ex3),s=1970.25,f=4)
+plot.ts(res3,ylab="res (size) ")
+abline(0,0)
+acf(res3)
+
+res4 <- resid(fit.ex4)
+plot(res4,ylab="res (size)")
+abline(0,0)
+acf(res4)
