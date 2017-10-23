@@ -1,4 +1,6 @@
 #install.packages("fpp") # Install Forecasting: principles and practice examples and exercises
+install.packages("fpp", repos = "http://cran.us.r-project.org", dependencies = TRUE)
+library(fpp)
 #library("fpp")            # Not sure if needed
 
 data1 = read.table("transcoding_measurement.tsv",header=TRUE)
@@ -85,5 +87,35 @@ abline(fit.ex3)
 summary(fit.ex3)$coef
 
 # The scatter plot includes the estimated regression line \hat{C} = 21760322.7 + 325380.9i
-#
 
+## Linear trend
+
+# A common feature of time series data is a trend. Using regression we can model and
+# forecast the trend in time series data by including  t=1,…,T,t=1,…,T,  as a predictor variable:
+# y_t = β_0 + β_1*t + ε_t
+
+
+#library(forecast)
+#library(ggplot2)
+
+#fit.ex4 <- tslm(data1$size~ trend)
+#f <- forecast(fit.ex4, h=5,level=c(80,95))
+#plot(f, ylab="Size of video", xlab="t")
+
+#lines(fitted(fit.ex4),col="blue")
+#summary(fit.ex4)$coef
+
+## Residual autocorrelation
+
+par(mfrow=c(2,2))
+res3 <- ts(resid(fit.ex3),s=1970.25,f=4) # Create time-series object using the residuals of 'fit.ex3' variable
+plot.ts(res3,ylab="res (utime)", xlab = "utime units(instead of Time)")  
+abline(0,0)
+
+acf(res3) # autocorrelation function for the model res3 (utime residuals)
+
+## Same thing for 'fit.ex4' variable 
+#res4 <- resid(fit.ex4)
+#plot(res4,ylab="res (size)")
+#abline(0,0)
+#acf(res4)
