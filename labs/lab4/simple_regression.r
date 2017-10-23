@@ -29,3 +29,27 @@ plot(res ~ data1$duration, ylab = "Residuals", xlab = "Duration of video", ylim 
 #fitted(fit)[1]
 #fcast <- forecast(fit, newdata=data.frame(data1$duration=30))
 #plot(fcast, xlab="City (mpg)", ylab="Carbon footprint (tons per year)")
+
+
+## P-value 
+summary(fit)$coef # We calculate the probability of obtaining a value of  β^1
+                  # as large as we have calculated if the null hypothesis were true
+
+## Confidence intervals
+confint(fit, level = 0.95) # Provide an interval estimate for β^1 in the fitted model
+
+### Non-linear functional forms
+# Simply transforming variables y and/or x and then estimating a regression model 
+# using the transformed variables is the simplest way of obtaining a non-linear specification.
+# We are going to use the log-log functional form 
+
+par(mfrow=c(1,2), mar=c(9,4,0,2)+0.1)
+fit2 <- lm(log(data1$size) ~ log(data1$duration)) # Do the fit for : log(y_i) = β_0 + β_1*log(x_i) + ε_i
+
+plot(data1$size ~ data1$duration,  xlab = "Duration of video", ylab = "Size of the video") # Plot standard x-y form
+lines(1:25000, exp(fit2$coef[1]+fit2$coef[2]*log(1:25000))) 
+
+plot(log(data1$size) ~ log(data1$duration),  xlab = "log Duration of video ", ylab = "log Size of the video") # log-log functional form
+abline(fit2) # Draw a line through our second fitting model
+# See that in this log-log form, the regression is much better since it gets through a lot more points
+
