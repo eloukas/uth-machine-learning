@@ -1,0 +1,212 @@
+---
+title: "Multiple regression"
+subtitle: 'Forecasting: principles and practice'
+output:
+  html_notebook: default
+  html_document: default
+---
+
+```{r echo=FALSE}
+# If we don't want a chunk to be visible in the output, just insert 'echo = false'
+# For example, we don't want any output of this chunk in our html or pdf document, but this chunk is necessary to run first
+# because it initializes the working enviroment! (read all-data.csv)
+
+# In an Rmd file, Markdown is outside the chunks and not R code.
+
+
+# Functions to read in the CSV table that contains all the raw data.
+# Before running these functions, make sure the file "all-data.csv" is
+# in the local directory.
+# Also, within the R environment, change the working directory to the directory
+# that contains the data file using the toolbar menu:
+# File -> Change dir
+#
+
+# Read the data from the csv file.
+processors <- read.csv("all-data.csv")
+
+################################################################
+#
+# This function returns the data from the desired column.
+# Example:  clock<-get_column("Fp2000","Processor.Clock..MHz.")
+
+get_column <- function(x,y) {
+
+# x = string with the name of the desired benchmark
+# y = desired column
+#
+# Find the indices of all rows that have an entry for the  
+# indicated benchmark
+benchmark <- paste(paste("Spec",x,sep=""),"..average.base.",
+	sep="")
+ix <- !is.na(processors[,benchmark])
+return(processors[ix,y])
+}
+################################################################
+
+
+################################################################
+# This function extracts the interesting data columns for the given benchmark
+# program and returns a dataframe with these columns.
+
+extract_data <- function(benchmark) {
+
+temp <- paste(paste("Spec",benchmark,sep=""),"..average.base.", sep="")
+
+# perf = the performance reported in the database
+perf <- get_column(benchmark,temp)
+
+#nperf = performance normalized to the overall range
+max_perf <- max(perf)
+min_perf <- min(perf)
+range <- max_perf - min_perf
+nperf <- 100 * (perf - min_perf) / range
+
+clock <- get_column(benchmark,"Processor.Clock..MHz.")
+threads <- get_column(benchmark,"Threads.core")
+cores <- get_column(benchmark,"Cores")
+TDP <- get_column(benchmark,"TDP")
+transistors <- get_column(benchmark,"Transistors..millions.")
+dieSize <- get_column(benchmark,"Die.size..mm.2.")
+voltage <- get_column(benchmark,"Voltage..low.")
+featureSize <- get_column(benchmark,"Feature.Size..microns.")
+channel <- get_column(benchmark,"Channel.length..microns.")
+FO4delay <- get_column(benchmark,"FO4.Delay..ps.")
+L1icache <- get_column(benchmark,"L1..instruction...on.chip.")
+L1dcache <- get_column(benchmark,"L1..data...on.chip.")
+L2cache <- get_column(benchmark,"L2..on.chip.")
+L3cache <- get_column(benchmark,"L3..on.chip.")
+
+return(data.frame(nperf, perf, clock, threads, cores, TDP, transistors, dieSize, voltage, featureSize, channel, FO4delay, L1icache, L1dcache, L2cache, L3cache))
+
+}
+################################################################
+
+
+# Extract a new data frame for each of the benchmark programs available in the data set.
+#cpu_info <- na.omit( extract_data("Int2006") )
+cpu_info <- extract_data("Int2006")
+
+```
+
+
+## Project 2: Multiple regression
+
+In multiple regression there is one variable to be forecast and several predictor variables.
+
+- We want to forecast the performance of a CPU based on many factors determined by its architecture. Thus, we use the values of several predictor variables to estimate/predict this one variable (performance)
+
+Instead of using the **Int2000** benchmark for the CPU performance reference, we will use the **Int2006** to differentiate from the book (chapter 4).
+
+## Introduction to multiple regression
+
+The general form of a multiple regression is 
+
+$$
+y_{i} = \beta_{0} + \beta_{1} x_{1,i} + \beta_{2} x_{2,i} + \cdots + \beta_{k} x_{k,i} + e_{i}, 
+$$
+
+where $y_{i}$ is the variable to be forecast and $x_{1,i},\dots,x_{k,i}$ are the $k$ predictor variables. 
+
+The coefficients $\beta_{1},\dots,\beta_{k}$ measure the effect of each predictor after taking account of the effect of all other predictors in the model.
+
+Thus, the coefficients measure the *marginal effects* of the predictor variables.
+
+***
+
+We first plot a pairwise comparison of all variables in the **Int2006** dataset:
+
+```{r}
+pairs(cpu_info, gap=0.5)
+```
+
+We can observe the linear relationship between the *perf* and *nperf* (normalized performance) variables. We can also observe the same kind of relationship between the *clock* frequency and the *perf/nperf*.
+
+The next step is to pick the minimum number of predictors that can give us a good prediction. As explained in the book, using all the factor is not the optimal method, as it leads to over-fitting. To decide which factors are best for using the model, the **Backward Elimination Process**.
+
+## Backward Elimination Process
+
+We use the *summary()* function to find each factor's significance level. We discard the factor with the highest significance level, until we reach to a factor with $p \lt 0.05$.
+
+```{r}
+cpu_lm <- lm(nperf ~ clock + threads + cores + transistors + dieSize + voltage + featureSize + channel + FO4delay + L1icache + sqrt(L1icache) + L1dcache + sqrt(L1dcache) + L2cache + sqrt(L2cache), data=cpu_info)
+
+summary(cpu_lm)
+```
+
+We remove $\sqrt{L1dcache}$, because of NA values and $threads$ because of the highest *p-value* ($p = 0.46116$).
+
+```{r}
+cpu_lm <- lm(nperf ~ clock + cores + transistors + dieSize + voltage + featureSize + channel + FO4delay + L1icache + sqrt(L1icache) + L1dcache + L2cache + sqrt(L2cache), data=cpu_info)
+
+summary(cpu_lm)
+```
+
+
+Then we remove the $FO4delay$ factor:
+
+```{r}
+cpu_lm <- lm(nperf ~ clock + cores + transistors + dieSize + voltage + featureSize + channel + L1icache + sqrt(L1icache) + L1dcache + L2cache + sqrt(L2cache), data=cpu_info)
+
+summary(cpu_lm)
+```
+
+Consequently, we remove the $dieSize$ factor ($p=0.20155$):
+
+```{r}
+cpu_lm <- lm(nperf ~ clock + cores + transistors + voltage + featureSize + channel + L1icache + sqrt(L1icache) + L1dcache + L2cache + sqrt(L2cache), data=cpu_info)
+
+summary(cpu_lm)
+```
+
+We remove the $voltage$ factor ($p=0.28078$):
+
+```{r}
+cpu_lm <- lm(nperf ~ clock + cores + transistors + featureSize + channel + L1icache + sqrt(L1icache) + L1dcache + L2cache + sqrt(L2cache), data=cpu_info)
+
+summary(cpu_lm)
+```
+
+Finally, we remove the $cores$ factor that has a marginally high p-value significance value:
+
+```{r}
+cpu_lm <- lm(nperf ~ clock + transistors + featureSize + channel + L1icache + sqrt(L1icache) + L1dcache + L2cache + sqrt(L2cache), data=cpu_info)
+
+summary(cpu_lm)
+```
+
+We don't have to remove any more factors, as the $p-values$ for all the predictors is far less than $0.05$. The factors we use for developing the multi-factor linear regression model are the *clock, transistors, featureSize, channel, L1icache, $\sqrt{L1icache}$, L1dcache, L2cache, $\sqrt{L2cache}$*. The final estimator model is:
+
+$$nperf = 
+-22.19 + 0.0107\times clock + 0.01089\times transistors - 293.4\times featureSize + \\
+488.3\times channel -12.29\times L1icache + 74.64\times \sqrt{L1icache} \\
++ 6.301 \times L1dcache + 0.002475 \times L2cache -0.4532 \times \sqrt{L2cache}$$
+
+The $R^2$ value is very close to $1$, which means that our estimation is pretty good. Furthermore, fewer observations have been dropped (due to NA values), because now we use fewer factors for the model estimator. These two observation show that our estimator behaves very good!
+
+## Residual Analysis
+
+We apply the *Residual Analysis* technique, to examine our model: 
+
+```{r}
+plot(fitted(cpu_lm), resid(cpu_lm))
+```
+
+We can see that the residuals are distributed somewhat uniformly around the mean value, which is almost zeo. No obvious patterns are visible, which means that the residuals are not well behaved. Below, we plot the histogram of the residual's distribution, which verifies that our model is not poor.
+
+```{r}
+# Plot histogram
+residual = resid(cpu_lm)
+hist(residual, xlab="Residuals", main="Histogram of residuals")
+
+# Plot normal distribution
+x = -10:10
+lines(x, 350*dnorm(x, mean=0, sd=sd(residual)), col=2)
+```
+
+Finally, by plotting a *Q-Q plot*,  we can see that the residuals almost follow a normal distribution, especially in the center. There is a visible divergence in both ends, although this applies to very few points. 
+
+```{r}
+qqnorm(residual)
+qqline(residual)
+```
