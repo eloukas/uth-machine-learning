@@ -1,5 +1,8 @@
-install.packages("fpp") # Install Forecasting: principles and practice examples and exercises
-library("fpp")            # Not sure if needed
+#install.packages("fpp") # Install Forecasting: principles and practice examples and exercises
+#library("fpp")            # Not sure if needed
+
+install.packages("fpp", repos = "http://cran.us.r-project.org", dependencies = TRUE)
+library(fpp)
 
 data = read.table("transcoding_measurement.tsv",header=TRUE)
 plot(data$size ~ data$duration,  xlab = "Duration of video", ylab = "Size of the video")
@@ -25,7 +28,7 @@ plot(res ~ data$duration, ylab = "Residuals", xlab = "Duration of video", ylim =
 # So, yes, there is a pattern since the values are not so scattered around.
 
 ## Forecasting with regression
-install.packages("forecast", dependencies=TRUE)
-library(package = "forecast")
+#install.packages("forecast", dependencies=TRUE)
+#library(package = "forecast")
 fcast = forecast(fit, newdata=(data$duration=204.9380))
 plot(fcast, xlab="Duration of video", ylab=" Size of the video" )
