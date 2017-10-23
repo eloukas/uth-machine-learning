@@ -1,0 +1,334 @@
+---
+title: "R Notebook"
+output:
+  html_notebook: default
+  html_document: default
+---
+
+```{r echo=FALSE}
+# If we don't want a chunk to be visible in the output, just insert 'echo = false'
+# For example, we don't want any output of this chunk in our html or pdf document, but this chunk is necessary to run first
+# because it initializes the working enviroment! (read all-data.csv)
+
+# In an Rmd file, Markdown is outside the chunks and not R code.
+
+
+# Functions to read in the CSV table that contains all the raw data.
+# Before running these functions, make sure the file "all-data.csv" is
+# in the local directory.
+# Also, within the R environment, change the working directory to the directory
+# that contains the data file using the toolbar menu:
+# File -> Change dir
+#
+
+# Read the data from the csv file.
+processors <- read.csv("all-data.csv")
+
+################################################################
+#
+# This function returns the data from the desired column.
+# Example:  clock<-get_column("Fp2000","Processor.Clock..MHz.")
+
+get_column <- function(x,y) {
+
+# x = string with the name of the desired benchmark
+# y = desired column
+#
+# Find the indices of all rows that have an entry for the  
+# indicated benchmark
+benchmark <- paste(paste("Spec",x,sep=""),"..average.base.",
+	sep="")
+ix <- !is.na(processors[,benchmark])
+return(processors[ix,y])
+}
+################################################################
+
+################################################################
+# This function extracts the interesting data columns for the given benchmark
+# program and returns a dataframe with these columns.
+
+extract_data <- function(benchmark) {
+
+# used for persentation purposes
+designer <- get_column(benchmark, "Designer")
+family <- get_column(benchmark, "Processor.Family")
+model <- get_column(benchmark, "Processor.Model")
+
+clock <- get_column(benchmark,"Processor.Clock..MHz.")
+TDP <- get_column(benchmark,"TDP")
+
+return(data.frame(designer, family, model, clock, TDP))
+
+}
+################################################################
+
+
+# Extract a new data frame for each of the benchmark programs available in the data set.
+cpu_info <- na.omit( extract_data("Int2006") )
+```
+
+
+# Project2: Simple Regression
+
+In this project, we apply simple linear regression on the **CPU info** dataset (given in Lab2). Our aim is to forecast the variable $y$ from a variable $x$, assuming a linear relationship between these two variables:
+
+$$y = \beta_0 + \beta_1 x + \varepsilon .$$
+
+In our case, we use the CPU's **Thermal Design Power** (TDP) as the indepented variable and **CPU's Clock Frequency** as the dependent variable. Thus, we want to predict the clock frequency of a CPU, given its TDP.
+
+First we need to estimate the parameters $beta_0$ and $beta_1$, which are the intercept and the slope of the line respectively. To do so, we use the *lm* function as follows:
+ 
+
+```{r, include=FALSE}
+library(fpp)
+```
+```{r}
+# plot the (x, y) points from the dataset
+plot(clock ~ TDP, xlab="TDP (Watts)", data=cpu_info,
+  ylab="CPU Clock Frequency (Mhz)")
+
+# calculate and plot the line
+fit <- lm(clock ~ TDP, data=cpu_info);
+abline(fit)
+```
+
+Below we can see some of the rows in the dataset. The CPU's designer, family and model are shown for reference purposes only. The important parts are the CPU clock frequency and TDP values.
+
+***
+```{r}
+head(cpu_info)
+```
+
+```{r}
+# estimate the goodness of fit
+x_var <- cpu_info$TDP
+y_var <- cpu_info$clock
+
+# apply the cor function 
+r_cor <- cor(x_var, y_var)
+r_cor
+fit.lm <- lm(clock ~ TDP, data=cpu_info)
+summary(fit.lm)$r.squared 
+
+```
+
+
+```{r}
+summary(fit)
+```
+
+***
+
+The estimated regression line is: $\hat{y} = 1999.9619 + 8.2351x.$
+
+Intercept: $\hat{\beta}_0=1999.9619$. A processor that has a thermal design power equal to $0$ watts will have a clock frequency of $~2000$ MHz.
+
+
+Slope: $\hat{\beta}_1=8.2351$. For every extra watt, the clock frequency is increased on average by $8.24$ Mhz. Alternatively, if two CPUS differ by $1$ watt (in their TDPs), their clock frequency will differ on average by $8.24$ MHz.
+
+## Residual plots
+
+```{r}
+res <- residuals(fit)
+plot(res ~ TDP, ylab="Residuals", xlab="TDP", data=cpu_info)
+abline(0,0)
+```
+
+
+
+## Forecasting with regression
+
+Assuming that the regression errors are normally distributed, an approximate 95% **forecast interval** (also called a prediction interval) associated with this forecast is given by 
+
+$$\hat{y} \pm 1.96 s_e\sqrt{1+\frac{1}{N}+\frac{(x-\bar{x})^2}{(N-1)s_x^2}},$$
+
+***
+
+The forecast interval is wider when $x$ is far from $\bar{x}$. That is, we are more certain about our forecasts when considering values of the predictor variable close to its sample mean.
+
+For a CPU with TDP equal to $100$ watts, the average clock frequency forecasted is $\hat{y}=2568.74$ MHz. The corresponding 95% forecast interval is $\lbrack 4.95, 6.84 \rbrack$ (calculated using R).
+
+For a car with City driving fuel economy $x=30$ mpg, the average footprint forecasted is $\hat{y}=5.90$ tons of CO$_2$ per year. The corresponding 95% forecast interval is $\lbrack 1998.353, 3648.6 \rbrack$ (calculated using R).
+
+***
+```{r, include=FALSE}
+library(forecast)
+```
+```{r}
+fcast <- forecast(fit, newdata=data.frame(TDP=100))
+fcast
+plot(fcast, xlab="TDP (Watts)", ylab="CPU Clock Frequency (Mhz)")
+```
+
+
+## P-value
+
+To determine how big the difference between $\hat{\beta}_1$ and $\beta_1$ must be before we would reject the null hypothesis, we calculate the probability of obtaining a value of $\beta_1$ as large as we have calculated if the null hypothesis were true. This probability is known as the *P-value*.
+
+```{r}
+summary(fit)$coef
+```
+
+
+## Confidence intervals
+
+It is also sometimes useful to provide an interval estimate for $\beta_1$, usually referred to as a *confidence interval* (and not to be confused with a forecast or prediction interval).
+
+```{r}
+confint(fit,level=0.95)
+```
+
+If the $100(1-\alpha)\%$ confidence interval for a parameter does not contain 0, then the associated P-value must be less than $\alpha$.
+
+
+## Non-linear functional forms
+
+Simply transforming variables $y$ and/or $x$ and then estimating a regression model using the transformed variables is the simplest way of obtaining a non-linear specification. 
+
+The most commonly used transformation is the (natural) logarithmic. Recall that in order to perform a logarithmic transformation to a variable, all its observed values must be greater than zero.
+
+A *log-log* functional form is specified as 
+
+$$\log y_i=\beta_0+\beta_1 \log x_i + \varepsilon_i. $$ 
+
+***
+
+```{r}
+#par(mfrow=c(1,2), mar=c(9,4,0,2)+0.1)
+fit2 <- lm(log(clock) ~ log(TDP), data=cpu_info)
+plot(clock ~ TDP, xlab="TDP (Watts)",
+  ylab="CPU Clock Frequency (MHz)", data=cpu_info)
+
+lines(1:186, exp(fit2$coef[1]+fit2$coef[2]*log(1:186)))
+plot(log(clock) ~ log(TDP), 
+  xlab="log TDP (Watts)", ylab="log CPU Clock Frequency", data=cpu_info)
+abline(fit2)
+```
+
+***
+
+```{r}
+res <- residuals(fit2)
+plot(res ~ log(TDP), 
+  ylab="Residuals", xlab="log(TDP)", data=cpu_info)
+```
+
+## Regression with time series data
+
+When using regression for prediction, we are often considering time series data and we are aiming to forecast the future. 
+
+Using a regression model to forecast time series data poses a challenge in that future values of the predictor variable are needed to be input into the estimated model, but these are not known in advance. One solution to this problem is to use *scenario based forecasting*.
+
+
+## Example
+
+```{r, eval=FALSE}
+par(mfrow=c(1,2))
+fit.ex3 <- lm(consumption ~ income, data=usconsumption)
+plot(usconsumption, ylab="% change in consumption and income",
+  plot.type="single", col=1:2, xlab="Year")
+legend("topright", legend=c("Consumption","Income"),
+ lty=1, col=c(1,2), cex=.9)
+plot(consumption ~ income, data=usconsumption, 
+ ylab="% change in consumption", xlab="% change in income")
+abline(fit.ex3)
+summary(fit.ex3)$coef
+```
+
+***
+
+```{r, echo=FALSE}
+par(mfrow=c(1,2))
+fit.ex3 <- lm(consumption ~ income, data=usconsumption)
+plot(usconsumption, ylab="% change in consumption and income",
+  plot.type="single", col=1:2, xlab="Year")
+legend("topright", legend=c("Consumption","Income"),
+ lty=1, col=c(1,2), cex=.9)
+plot(consumption ~ income, data=usconsumption, 
+ ylab="% change in consumption", xlab="% change in income")
+abline(fit.ex3)
+summary(fit.ex3)$coef
+```
+
+***
+
+The scatter plot includes the estimated regression line 
+
+$$\hat{C}=0.52+0.32I, $$
+
+which shows that a 1 unit (1\%) increase in personal disposable income will result to an average increase of 0.84 unit (0.84\%) in personal consumption expenditure. We are interested in forecasting consumption for the four quarters of 2011.
+
+A policy maker may want to forecast consumption if there is a 1\% growth or a 1\% decline in income for each of the quarters in 2011.
+
+Forecast intervals for scenario based forecasts do not include the uncertainty associated with the future values of the predictor variables. They assume the value of the predictor is known in advance.
+
+An alternative approach is to use genuine forecasts for the predictor variable.
+
+
+## Linear trend
+
+A common feature of time series data is a trend. Using regression we can
+model and forecast the trend in time series data by including
+$t=1,\ldots,T,$ as a predictor variable:
+$$y_t=\beta_0+\beta_1t+\varepsilon_t. $$ 
+
+```{r, eval=FALSE}
+fit.ex4 <- tslm(austa ~ trend)
+f <- forecast(fit.ex4, h=5,level=c(80,95))
+plot(f, ylab="International tourist arrivals to Australia (millions)",
+  xlab="t")
+lines(fitted(fit.ex4),col="blue")
+summary(fit.ex4)$coef
+```
+
+***
+
+```{r, echo=FALSE}
+fit.ex4 <- tslm(austa ~ trend)
+f <- forecast(fit.ex4, h=5,level=c(80,95))
+plot(f, ylab="International tourist arrivals to Australia (millions)",
+  xlab="t")
+lines(fitted(fit.ex4),col="blue")
+summary(fit.ex4)$coef
+```
+
+
+## Residual autocorrelation
+
+With time series data it is highly likely that the value of a variable observed in the current time period will be influenced by its value in the previous period, or even the period before that, and so on. 
+
+Therefore when fitting a regression model to time series data, it is very common to find autocorrelation in the residuals. 
+
+In this case, the estimated model violates the assumption of no autocorrelation in the errors, and our forecasts may be inefficient ??? there is some information left over which should be utilized in order to obtain better forecasts. 
+
+The forecasts from a model with autocorrelated errors are still unbiased, and so are not ???wrong???, but they will usually have larger prediction intervals than they need to.
+
+***
+
+```{r, eval=FALSE}
+par(mfrow=c(2,2))
+res3 <- ts(resid(fit.ex3),s=1970.25,f=4)
+plot.ts(res3,ylab="res (Consumption)")
+abline(0,0)
+Acf(res3)
+res4 <- resid(fit.ex4)
+plot(res4,ylab="res (Tourism)")
+abline(0,0)
+Acf(res4)
+```
+
+***
+
+```{r, echo=FALSE}
+par(mfrow=c(2,2))
+res3 <- ts(resid(fit.ex3),s=1970.25,f=4)
+plot.ts(res3,ylab="res (Consumption)")
+abline(0,0)
+Acf(res3)
+res4 <- resid(fit.ex4)
+plot(res4,ylab="res (Tourism)")
+abline(0,0)
+Acf(res4)
+```
+
+
