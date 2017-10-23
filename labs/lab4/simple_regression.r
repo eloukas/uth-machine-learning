@@ -1,7 +1,6 @@
-#install.packages("fpp") # Install Forecasting: principles and practice examples and exercises
 install.packages("fpp", repos = "http://cran.us.r-project.org", dependencies = TRUE)
 library(fpp)
-#library("fpp")            # Not sure if needed
+
 
 data1 = read.table("transcoding_measurement.tsv",header=TRUE)
 plot(data1$size ~ data1$duration,  xlab = "Duration of video", ylab = "Size of the video")
@@ -27,11 +26,14 @@ plot(res ~ data1$duration, ylab = "Residuals", xlab = "Duration of video", ylim 
 # So, yes, there is a pattern since the values are not so scattered around.
 
 ## Forecasting with regression
-#library(package = "forecast")
-#fitted(fit)[1]
-#fcast <- forecast(fit, newdata=data.frame(data1$duration=30))
-#plot(fcast, xlab="City (mpg)", ylab="Carbon footprint (tons per year)")
+fitted(fit)[1]
+newdata = data.frame(data1$duration)
 
+fcast <- forecast(fit,newdata[1] > 130.3567)#=data.frame(duration>30)) 
+# It will take a while due to the large size of the data(see global env)
+
+plot(fcast, xlab="Duration of video", ylab="Size of video")
+# This will plot us the result of the forecasting method for the the videos(data) that have duration larger thatn 130.3567 time units
 
 ## P-value 
 summary(fit)$coef # We calculate the probability of obtaining a value of  β^1
