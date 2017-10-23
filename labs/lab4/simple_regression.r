@@ -53,3 +53,37 @@ plot(log(data1$size) ~ log(data1$duration),  xlab = "log Duration of video ", yl
 abline(fit2) # Draw a line through our second fitting model
 # See that in this log-log form, the regression is much better since it gets through a lot more points
 
+## Residuals in log-log functional form
+
+res = residuals(fit2)
+plot( res ~ data1$duration, xlab = "log(Duration)", ylab= "Residuals")
+# We see that most residuals are between -2 and +3 while most log(Duration) points is between 0 and 3000
+# Oh, and there is our lonely value right there with log(Duration) = ~25000
+
+
+## Regression with time series data
+
+# We are going to replace our x variable with 'utime' now.
+# utime = total transcoding time for transcoding
+# We are trying to impersonate utime with 'time' in this series of data, for the sake of simplicity.
+# So, we can give as input a "future" 'utime' value and we will 'scenario-based' forecast the size of the video, 
+# after we do the regression.
+#
+# Warning: It would be better to replace the 'utime' variable with a 'Year' variable. As said, we do not want to change
+# the data only because of this example!
+
+par(mfrow=c(1,2)) # Change parameters for plot
+
+fit.ex3 <- lm(data1$size ~ data1$utime) # Linear Model Fit for size ~ utime
+plot(data1$size ~ data1$utime, ylab="% change in consumption and income", type="single", col=1:2, xlab="utime") #plot
+
+legend("topright", legend=c("Size","utime"), lty=1, col=c(1,2), cex=.9)
+
+plot(data1$size ~ data1$utime, ylab="% change in size", xlab="% change in utime")
+
+abline(fit.ex3)
+summary(fit.ex3)$coef
+
+# The scatter plot includes the estimated regression line \hat{C} = 21760322.7 + 325380.9i
+#
+
