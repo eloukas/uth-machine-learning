@@ -1,0 +1,433 @@
+---
+output:
+  html_document: default
+  pdf_document: default
+---
+#  Principal Component Analysis
+
+## Computing PCA SVD & PCA Using R's prcomp()
+
+
+Refs:
+
+Material in piazza.com
+
+This tutorial shows the necessary steps to perform the dimension reduction of Principal Component Analysis (PCA)
+
+Wikipedia: >Principal component analysis (PCA) is a mathematical procedure that uses an orthogonal transformation to convert a set of observations of possibly correlated variables into a set of values of linearly uncorrelated variables called principal components.
+
+PCA is an orthogonal linear transformation that transforms the data to a new coordinate system such that the greatest variance by any projection of the data comes to lie on the first coordinate (called the first principal component), the second greatest variance on the second coordinate, and so on. In this sense, PCA computes the most meaningful basis to express our data. Remember that a basis is a set of linearly independent vectors, that, in a linear combination, can represent every vector (they form a coordinate system).
+
+# Let's understand it using an example:
+Let's say we have a data set of dimension $ 300 (m) \times 50 (p)$ $m$ represents the number of observations and $p$ represents number of predictors (independet variables). Since we have a large p = 50, there can be $p(p-1)/2$ scatter plots i.e more than 1000 plots possible to analyze the variable relationship. It will be a tedious job to perform exploratory analysis on this data!
+
+In this case, it will make sense to select a subset of $k$ $(k << 50)$ predictors which captures as much information. Followed by plotting the observations in the resultant low dimensional space.
+The image below shows the transformation of a 3 dimensional data  to 2 dimensional data  using PCA. Not to forget, each resultant dimension (PCA dimension) is a linear combination of $p$ original predictors (referred as features).
+
+
+
+![PCA example - 3D to 2D transformation.](pca_graphics_example.png)
+
+One important fact: PCA returns a new basis (principal components) nwhich is a linear combination of the original basis. This limits the number of possible basis PCA can find.
+
+## What are principal components?
+
+A principal component is a normalized linear combination of the original predictors in a data set. In image above, PC1 and PC2 are the principal components. Let's say we have a set of predictors as $X_1, X_2, \dots, X_p$
+The principal component can be written as:
+
+$Y_1 = a_{11}X_1 + a_{12}X_2 + \dots + a_{1p}X_p$
+where,
+	$Y_1$ is first principal component
+	$a_1$ is the "loading vector" comprising of loadings $(a_{11}, a_{12},\dots)$ of first principal component. The loadings are constrained to a sum of square equals to 1. This is because large magnitude of loadings may lead to large variance. It also defines the direction of the principal component $(Z_1)$ along which data varies the most. It results in a line in the reduced $k$ dimensional space which is closest to the $m$ observations. Closeness is measured using average squared euclidean distance.
+The $X_1,\dots, X_p$ are normalized predictors. Normalized predictors have mean equals to zero and standard deviation equals to one.
+Therefore,
+First principal component is a linear combination of original predictor variables which captures the maximum variance in the data set. It determines the direction of highest variability in the data. Larger the variability captured in first component, larger the information captured by component. No other component can have variability higher than first principal component.
+The first principal component results in a line which is closest to the data i.e. it minimizes the sum of squared distance between a data point and the line.
+
+## Similarly, we can compute the second principal component also.
+
+Second principal component $(Y_2)$ is also a linear combination of original predictors which captures the remaining variance in the data set and is uncorrelated with $Z_1$. In other words, the correlation between first and second component should be zero. It can be represented as:
+$Y_2 = a_{21}X_1 + a_{22}X_2 + \dots + a_{2p}X_p$.
+If the two components are uncorrelated, their directions should be orthogonal (image below). This image is based on a simulated data with 2 predictors. Notice the direction of the components, as expected they are orthogonal. This suggests the correlation b/w these components in zero.
+![Orthogonality of principal components.](image2.png)
+All succeeding principal component follows a similar concept i.e. they capture the remaining variation without being correlated with the previous component. The directions of these components are identified in an unsupervised way i.e. the response variable(Y) is not used to determine the component direction. Therefore, it is an unsupervised approach.
+Note: Partial least square (PLS) is a supervised alternative to PCA. PLS assigns higher weight to variables which are strongly related to response variable to determine principal components.
+
+
+
+
+So, if $X$ is the original dataset, $Y$ is the transformed dataset (both with size $m \times p$), and $P$ is the linear transformation ($m\times m$)
+
+$$PX=Y$$
+
+$P$ can be seen as the matrix that transforms $X$ in $Y$, or as the geometrical transformation (rotation + stretch) that transforms $X$ in $Y$. The rows of $P$ are the set of vectors that define the new basis for expressing the columns of $X$. These row vectors, if properly defined, are the principal components of $X$. For our datasets, a row of $X$ is the set of measurements of a particular type, while a column of $X$ are the set of measurements of a single observation.
+
+Among all the possible new basis, PCA chooses one that reduce the redundacy of the data, ie, the one where the covariance between variables is as little as possible. That means a covariance matrix as near as a diagonal matrix as possible (all off-diagonal values as close to zero as possible).
+
+For PCA, the basis vector with the largest variance is the most principal (the one that explains more variance from the dataset). This basis vector will be the first row of $P$. The resulting ordered rows of $P$ are the principal components.
+
+## The assumptions of PCA: 
+
+  * Linearity: the new basis is a linear combination of the original basis 
+  * Mean and variance are sufficient statistics: PCA assumes that these statistics totally describe the distribution of the data along the axis (ie, the normal distribution). 
+  * Large variances have important dynamics: high variance means signal, low variance means noise. This means that PCA implies that the dynamics has high SNR (signal to noise ratio). 
+  * The components are orthonormal
+
+If some of these features is not appropriate, PCA might produce poor results.
+
+Algebra details aside, we choose $P$ to be the matrix where each row is an eigenvector of the covariance matrix of $X$ which is  given by $\frac{1}{n-1}XX^T$.
+
+## Why is normalization of variables necessary ?
+
+The principal components are supplied with normalized version of original predictors. This is because, the original predictors may have different scales. For example: Imagine a data set with variables  measuring units as gallons, kilometers, light years etc. It is definite that the scale of variances in these variables will be large.
+Performing PCA on un-normalized variables will lead to insanely large loadings for variables with high variance. In turn, this will lead to dependence of a principal component on the variable with high variance. This is undesirable.
+As shown in image below, PCA was run on a data set twice (with unscaled and scaled predictors). This data set has ~40 variables. You can see, first principal component is dominated by a variable Item_MRP. And, second principal component is dominated by a variable Item_Weight. This domination prevails due to high value of variance associated with a variable. When the variables are scaled, we get a much better representation of variables in 2D space.
+![Orthogonality of principal components.](image3.png)
+
+# Computing PCA
+Let's go through the steps necessary to compute PCA of a given dataset:
+```{r}
+library(stats) # use: cov()
+```
+
+# get some data:
+```{r}
+x <- c(2.5,.5,2.2,1.9,3.1,2.3,2,1,1.5,1.1)
+y <- c(2.4,0.7,2.9,2.2,3.0,2.7,1.6,1.1,1.6,.9)
+plot(x,y,xlim=c(-1,4),ylim=c(-1,4)); abline(h=0,v=0,lty=3)
+```
+
+
+Each data sample (herein, the pairs $(x,y)$) is a n-dimensional vector (herein, $n=2$) in a orthonormal basis (so, the axis are perpendicular, which happens with the example since we are using the usual x,y cartesian axis).
+
+For PCA to work properly, we must subtract the mean for each dimension this produces a data set whose "mean" is zero
+```{r}
+x1 <- x - mean(x)
+y1 <- y - mean(y)
+plot(x1,y1); abline(h=0,v=0,lty=3)
+```
+
+
+The next step is to compute the covariance matrix (aka, dispersion matrix), i.e., a matrix whose element in the (i,j) position is the covariance between the ith and jth elements of a random vector (that is, of a vector of random variables).
+```{r}
+m <- matrix(c(x1,y1),ncol=2) # make a matrix of the given data
+m
+```
+```{r}
+cov.m <- cov(m)
+cov.m  # notice that the non-diagonal values are both positive, ie, x&y increase together
+```
+
+Then we find the eigenvectors & eigenvalues of the covariance matrix. This will be the new basis vectors:
+```{r}
+cov.eig <- eigen(cov.m)
+cov.eig
+```
+```{r}
+cov.eig$vectors[,1] %*% cov.eig$vectors[,2] # should equals zero since they are orthogonal between themselves
+```
+
+# let's plot these eigenvectors onto the data to present the new basis
+```{r}
+plot(x1,y1); abline(h=0,v=0,lty=3)
+abline(a=0,b=(cov.eig$vectors[1,1]/cov.eig$vectors[2,1]),col="red")
+abline(a=0,b=(cov.eig$vectors[1,2]/cov.eig$vectors[2,2]),col="green")
+```
+
+
+The first eigenvector (the red line) seems like a linear fit, showing us how it is related to the data but the other eigenvector does not seem that related to the data
+
+If we look to the eigenvalues, the first is much larger than the second: the highest eigenvalue identifies the dataset's principle component.
+
+Once found the eigenvectors, we should order them decreasingly by their eigenvalues. This give us the components by order of significance! We can decide to ignore the components with less significance: we will lose information but not that much if their values are small.
+
+So we start with a dataset of $n$ dimensions, choose $p$ components and get a new dataset with $p$ dimensions representing the original dataset. The $feature vector$ is the matrix of the eigenvectors we choose to keep.
+
+This process of removing the less important axes can help reveal hidden, simplified dynamics in high dimensional data. This process is called dimensional reduction.
+
+In our 2D case we just have two options, (1) keep the first or (2) keep both that is:
+```{r}
+f.vector1 <- as.matrix(cov.eig$vectors[,1],ncol=1)  # feature vector with just one component
+f.vector1
+```
+```{r}
+f.vector2 <- as.matrix(cov.eig$vectors[,c(1,2)],ncol=2) # feature vector with both components
+f.vector2
+```
+
+With our feature vector we can derive the new transformed dataset.
+
+If $M$ is the original dataset and $F$ is the feature vector, then the transpose for the new dataset is given by $F^T \times M^T$
+```{r}
+final1 <- t(f.vector1) %*% t(m) # new dataset for feature vector 1
+final1
+```
+```{r}
+final2 <- t(f.vector2) %*% t(m) # new dataset for feature vector 2
+final2
+```
+
+After the transformation, the data is decorrelated: the covariance between the variables is zero:
+```{r}
+cov(t(final2))
+```
+
+These final datasets are the original data in term of the vectors we chose, ie, they are no longer over x,y axis, but use the chosen eigenvectors as their new axis.
+
+# final1 as 1 dimension
+```{r}
+t(final1) 
+```
+
+# final2 as 2 dimensions, we can plot it:
+```{r}
+plot(final2[1,],final2[2,],ylim=c(-2,2));abline(h=0,v=0,lty=3)
+```
+
+
+We can optionally recover the original data back, by 100% if we have chosen all components, or an approximation otherwise.
+
+To do that, if $M^{'}$ is the final dataset, and $F$ is the feature vector, then the initial dataset is ($F \times M^{'})^T$:
+```{r}
+# if we keep all eigenvectors, we can recover it by 100% (like in final2)
+
+original.dataset2 <- t(f.vector2 %*% final2)
+original.dataset2[,1] <- original.dataset2[,1] + mean(x) # re-add means
+original.dataset2[,2] <- original.dataset2[,2] + mean(y)
+original.dataset2
+```
+```{r}
+plot(original.dataset2[,1],original.dataset2[,2],xlim=c(-1,4),ylim=c(-1,4))
+abline(h=0,v=0,lty=3)
+```
+
+```{r}
+# if we keep just some eigenvector (like final1), we do the same but cannot 
+# expect the original information, just some degraded version:
+original.dataset1 <- t(f.vector1 %*% final1)
+original.dataset1[,1] <- original.dataset1[,1] + mean(x) # re-add means
+original.dataset1[,2] <- original.dataset1[,2] + mean(y)
+original.dataset1
+```
+```{r}
+plot(original.dataset1[,1],original.dataset1[,2],xlim=c(-1,4),ylim=c(-1,4))
+abline(h=0,v=0,lty=3)
+```
+
+
+Notice that in the approximation (final1) the variation over the 2nd eigenvector is gone as expected (since it was previously erased).
+
+# SVD & PCA
+Singular Vector Decomposition solves PCA. For a matrix $M=U\times D \times V^T$, the principal components of $M$ are given by the columns of the right singular vectors $V$.
+```{r}
+svd.m <- svd(scale(m))
+svd.m$v
+```
+```{r}
+pca.m <- prcomp(m,scale=TRUE)
+pca.m$rotation
+```
+
+## Using R's prcomp()
+Library stats includes function prcomp() to perform PCA:
+```{r}
+library(stats) # use: prcomp()
+
+df = data.frame(x=x, y=y)
+df
+```
+```{r}
+# prcomp() does the mean centering (option center=TRUE)
+# also it scales the variables so that all have unit variance (scale=TRUE). This is necessary if the data has different units (it uses correlation matrix). In this case, the units are the same, and we like to have the same results as above (it uses covariance matrix):
+pca.eg <- prcomp(df, scale=FALSE) 
+pca.eg # check the rotation attributes are equal to cov.eig above (except for the minus sign which is irrelevant)
+```
+```{r}
+## y -0.7351787 -0.6778734
+plot(x1,y1); abline(h=0,v=0,lty=3)
+abline(a=0,b=(pca.eg$rotation[1,1]/pca.eg$rotation[2,1]),col="red")
+abline(a=0,b=(pca.eg$rotation[1,2]/pca.eg$rotation[2,2]),col="green")
+```
+
+```{r}
+summary(pca.eg)
+```
+```{r}
+par(mfrow=c(1,2))
+plot(pca.eg)
+biplot(pca.eg) # samples are displayed as points, variables are displayed  as vectors
+```
+
+```{r}
+par(mfrow=c(1,1))
+# argument 'tol' receives a value indicating the magnitude below which components should be omitted. (Components are omitted if their standard deviations are less than or equal to tol times the standard deviation of the first component.)
+prcomp(df, scale=TRUE, tol=.2) 
+```
+
+A (not entirely successful) example of image processing and reduction
+```{r}
+#source("http://bioconductor.org/biocLite.R")
+#biocLite("ripa", dependencies=TRUE)
+#biocLite("rARPACK", dependencies=TRUE)
+#install.packages('devtools')
+library(devtools)
+#install_github('ririzarr/rafalib')
+
+# Load libraries
+library(rARPACK)
+library(ripa)    #  function "imagematrix"
+library(EBImage)
+library(jpeg)
+library(png)
+#
+library(rafalib)
+#mypar2()
+#
+# Read the image
+#img <- readImage("images/pansy.jpg") 
+#dim(img)
+```
+```{r}
+# to install:
+#source("https://bioconductor.org/biocLite.R")
+#biocLite("BiocUpgrade")
+#biocLite("EBImage")
+library("EBImage")
+library("stats")
+
+pic <- Image(flip(readImage("pansy.jpg")))
+red.weigth   <- .2989; green.weigth <- .587; blue.weigth  <- 0.114
+m <- red.weigth * imageData(pic)[,,1] + green.weigth * imageData(pic)[,,2] + blue.weigth  * imageData(pic)[,,3]
+image(m, col = grey(seq(0, 1, length = 256)))
+```
+```{r}
+pca.m <- prcomp(m, scale=TRUE)
+# Let's plot the cumulative variance of all 465 components
+plot(summary(pca.m)$importance[3,], type="l", ylab="%variance explained", xlab="nth component (decreasing order)")
+abline(h=0.99,col="red")
+# to capture 99% of the variance, we need the first 165 components
+abline(v=165,col="red",lty=3)
+```
+
+```{r}
+chosen.components <- 1:165
+feature.vector <- pca.m$rotation[,chosen.components]
+feature.vector[1:10,1:5] # show the initialvalue s
+```
+```{r}
+# make the final dataset (the compact dataset using only the chosen components)
+compact.data <- t(feature.vector) %*% t(m)
+dim(compact.data) # we cut lots of columns
+```
+```{r}
+approx.m <- t(feature.vector %*% compact.data) # let's recover the data and show the approximation
+dim(approx.m)
+```
+```{r}
+image(approx.m, col = grey(seq(0, 1, length = 256)))
+```
+
+
+##Another example
+Taken from here http://www.r-bloggers.com/reconstructing-principal-component-analysis-matrix/
+```{r}
+# get the dataset from https://spark-public.s3.amazonaws.com/dataanalysis/face.rda
+# you probably want to use stats::prcomp for PCA on big matrices
+load('face.rda')
+runPCA <- function(mat = 'Unadjusted matrix') eigen(cov(apply(mat, 2, function(i) i - mean(i))))
+pca <- runPCA(faceData)
+
+
+str(pca)
+```
+```{r}
+# First thing after doing PCA is to check the contributions of each PC in explaining the variance.
+varExplained <- function(eigenList) {
+
+par(mfrow = c(1,2))
+
+plot(
+ eigenList$value / sum(eigenList$value), pch = 21, col = 'black',
+ bg = '#549cc4', ylim = c(0, 1), xlab = 'Principal Component',
+ ylab = 'Variance Explained'
+ ) + abline(h = 0.9)
+
+plot(
+ cumsum(eigenList$value) / sum(eigenList$value), pch = 21,
+ col = 'black', bg = '#549cc4', ylim = c(0, 1), xlab = 'Principal Component',
+ ylab = 'Cumulative Variance Explained'
+ ) + abline(h = 0.9)
+}
+
+varExplained(pca)
+
+```
+```{r}
+# From these plots you can see that faceData has ~5 PC's that cumulatively explain ~90% of total variance. Lets use this information to reconstruct the matrix, and compare it to the original one.
+
+afterPCA <- function(
+ matAdjust = 'Centered matrix',
+ meanList = 'List of column means of original (unadjusted) matrix',
+ eigenList = 'List of eigenvalues and eigenvectors of adjust matrix covariance matrix',
+ n = 'selected PC\'s',
+ specific_select = 'If True: n == 1:n, if False: just n\'th columns') {
+
+ if (length(n) > ncol(matAdjust)) stop('N is higher than the number of PC\'s')
+ if (!specific_select & length(n) > 1) stop('Use a single number when selecting up to n\'th PC')
+ if (!specific_select) n <- 1:n
+
+ t(eigenList$vectors[,n] %*% (t(eigenList$vectors[,n]) %*% t(matAdjust))) + t(matrix(meanList, nrow = nrow(matAdjust), ncol = ncol(matAdjust)))
+}
+
+# ColorBrewer palette
+library(RColorBrewer)
+showMatrix <- function(x, ...) image(t(x[nrow(x):1,]), xaxt = 'none', yaxt = 'none', col = rev(colorRampPalette(brewer.pal(7, 'Blues'))(100)), ...)
+
+reconstMatrix <- afterPCA(
+ matAdjust = apply(faceData, 2, function(i) i - mean(i)),
+ meanList = apply(faceData, 2, mean),
+ eigenList = pca,
+ n = 5,
+ specific_select = FALSE
+)
+
+par(mfrow = c(1,2), mar = c(0, 0, 1, 0), bty = 'n')
+showMatrix(faceData, main = 'Original Matrix')
+showMatrix(reconstMatrix, main = 'First 5 PC\'s')
+```
+
+As seen from eigenvalues (variances), taking only 5/32 PC's is enough to recreate face that has almost all of the features of the original matrix.
+
+##Kernel PCA
+In Kernel PCA, through the use of kernels, principle components can be computed efficiently in high-dimensional feature spaces that are related to the input space by some nonlinear mapping.
+
+Kernel PCA finds principal components which are nonlinearly related to the input space by performing PCA in the space produced by the nonlinear mapping, where the low-dimensional latent structure is, hopefully, easier to discover.
+
+Unfortunately Kernel PCA does not inherit all the strength of PCA. More specifically reconstruction of training and test data points is not a trivial practice in Kernel PCA. Finding the corresponding patterns is difficult and sometimes even impossible.
+
+refs:
+
+http://www.cis.temple.edu/~latecki/Courses/AI-Fall11/Lectures/Embeddings.pdf
+http://cran.r-project.org/web/packages/kernlab/vignettes/kernlab.pdf
+```{r}
+#library(kernlab)
+
+#data(iris)
+#test <- sample(1:150,20)
+
+#kpc <- kpca(~., data=iris[-test,-5],
+            #kernel = "rbfdot",  # Gaussian Radial Basis kernel function
+            #kpar   = list(sigma=0.2),
+            #features=2)
+
+#head( pcv(kpc) )  # print the principal component vectors
+```
+```{r}
+# plot the data projection on the components
+#plot(rotated(kpc), col=as.integer(iris[-test,5]),
+#xlab="1st Principal Component",ylab="2nd Principal Component")
+
+# embed remaining points
+#emb <- predict(kpc,iris[test,-5])
+#points(emb, col=as.integer(iris[test,5]))
+```
