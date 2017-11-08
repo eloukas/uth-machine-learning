@@ -1,4 +1,8 @@
+# Don't add R-studio's checkpoints
 .Rproj.user
 .Rhistory
 .RData
 .Ruserdata
+
+# Don't add Amazon/Jupyter Notebooks' checkpoints
+.ipynb_checkpoints
