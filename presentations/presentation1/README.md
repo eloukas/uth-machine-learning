@@ -15,5 +15,5 @@ https://support.sas.com/edu/elearning.html?ctry=us&productType=library
 4. Prepare a power point presentation for the installation and programming in SaS.
 
 
-## Presenation can be found below:
+## The Presentation can be found below:
 [Link to our slides.com presentation](http://slides.com/eleftheriosp-loukas/sas-intro)
