@@ -1,0 +1,89 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+```{r}
+df <- read.table("wine_dataset.txt", sep = ",",header = TRUE, row.names = NULL)
+
+X <- matrix(cbind(df$Alcohol[1:130],df$Malic.acid[1:130]), ncol=2) # Attributes : -1- Alcohol, -2- Malic acid
+y <- matrix(df$class[1:130]) # ['class_1' 'class_2'] wine
+
+plot(X[,1][1:59], X[,2][1:59],xlab="Alcohol ", ylab="Malic Acid", pch=20, col="blue")
+par(new=TRUE)
+plot(X[,1][60:130], X[,2][60:130],xlab="Alcohol ", ylab="Malic Acid", pch=20, col="red")
+legend(11.0,6.0,legend=c("class 1 wine", "class 2 wine"),col=c("blue", "red"),pch = 20)
+par(new=FALSE)
+```
+
+```{r}
+library(matrixStats)
+#Sigmoid function
+logistic_func <- function(theta, X) {
+    z <- X%*%theta
+    g <- 1/(1+exp(-z))
+    return(g)
+}
+
+log_gradient <- function(theta, X, y) {
+    first_calc = logistic_func(theta, X) - y
+    final_calc = t(first_calc)%*%X
+    return(final_calc)
+}
+
+#Cost Function
+cost_func <- function(theta,X,y) {
+    log_func_v <- logistic_func(theta, X)
+    step1 <- y * log(log_func_v)
+    step2 <- (1-y) * log(1 - log_func_v)
+    final <- -step1 - step2
+    return (mean(final))
+}
+
+grad_desc <- function(theta, X, y, lr=0.001, converge_change=0.001) {
+  
+  #normalize
+  X = (X - colMeans(X)) / colSds(X)
+  
+  #setup cost iter
+  cost_iter = list()
+  cost = cost_func(theta, X, y)
+  cost_iter[1] = cost
+  change_cost = 1
+  i = 1
+  
+  while(change_cost > converge_change) {
+      old_cost = cost
+      theta = theta - (lr*log_gradient(theta, X, y))
+      cost = cost_func(theta, X, y)
+      cost_iter[i+1] = cost
+      change_cost = old_cost - cost
+      i = i + 1
+  }
+  return (theta, cost_iter)
+}
+
+pred_values <- function(theta, X, hard=TRUE) {
+  #normalize
+  X = (X - colMeans(X)) / colSds(X)
+  pred_prob = logistic_func(theta, X)
+  
+  pred_value = list()
+  for (i in 1:nrow(pred_prob)) {
+    if (pred_prob[i] > 0.5) {
+      pred_value[i] = 1
+    } else {
+      pred_value[i] = 2
+    }
+  }
+  if (hard) {
+    return(pred_value)
+  }
+  return(pred_prob)
+}
+
+# Intial theta
+initial_theta <- rep(0, ncol(X))
+
+# Cost at inital theta
+grad_desc(initial_theta,X,y)
+```
