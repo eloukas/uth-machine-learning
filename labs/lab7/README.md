@@ -1,3 +1,3 @@
 # Lab7:
 
-![readme](/images/readme.png)
+![](./images/readme.png)
