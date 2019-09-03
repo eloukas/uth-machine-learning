@@ -1,9 +1,10 @@
-# PSEs and Data Science (ce514)
+# Problem Solving Environments for Data Science Applications (ce514)
 
-This course introduces problem solving environments including Python, R, Julia, SaS, JMP, and Excel.
-It trains us as undergraduate students to use them to apply least squares and regression techniques for big data,
-to solve nonlinear optimization problems with classical, stochastic, and genetic algorithms using
-well known libraries like qurobi library and Argonne Optimization Server, and data mining problems.
+This course introduces problem solving environments including Python, R, Julia, SaS, JMP, and Excel for applications in the domain of Data Science.
+
+The weekly labs and projects train us on:
+- **regression, classification and clustering techniques for big data**
+- **solving nonlinear optimization problems with classical, stochastic, and genetic algorithms using well known libraries like sci-kit learn, pandas, numpy, qurobi**
 
 # Instructor
 [Elias Houstis](https://www.e-ce.uth.gr/department/faculty/enh/) - enh@e-ce.uth.gr
