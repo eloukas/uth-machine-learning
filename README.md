@@ -1,10 +1,8 @@
-# Problem Solving Environments for Data Science Applications (ce514)
+# Problem Solving Environments for Data Science Applications (CE514 Course)
 
-This course introduces problem solving environments including Python, R, Julia, SaS, JMP, and Excel for applications in the domain of Data Science.
+This repo provides an extensive introduction to **Python**, R, Excel, SaS computing environments **and key libraries for large-scale data analysis and optimization problems, exploiting Data Science applications.**
 
-The weekly labs and projects train us on:
-- **regression, classification and clustering techniques for big data**
-- **solving nonlinear optimization problems with classical, stochastic, and genetic algorithms using well known libraries like sci-kit learn, pandas, numpy, qurobi**
+The weekly labs and projects train us on developing machine learning techniques for a number of cases, such as **regression, classification and clustering techniques for big data**.
 
 # Instructor
 [Elias Houstis](https://www.e-ce.uth.gr/department/faculty/enh/) - enh@e-ce.uth.gr
