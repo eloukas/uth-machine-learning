@@ -2,7 +2,7 @@
 
 This repo provides an extensive introduction to **Python**, R, Excel, SaS computing environments **and key libraries for large-scale data analysis and optimization problems, exploiting Data Science applications.**
 
-The weekly labs and projects train us on developing machine learning techniques for a number of cases, such as **regression, classification and clustering techniques for big data**.
+The weekly labs and projects train us on developing machine learning algorithms for a number of cases, such as **regression, classification and clustering techniques for big data**.
 
 # Instructor
 [Elias Houstis](https://www.e-ce.uth.gr/department/faculty/enh/) - enh@e-ce.uth.gr
