@@ -1,6 +1,6 @@
-# Problem Solving Environments for Data Science Applications (CE514 Course)
+# Machine Learning for Data Science and Analytics
 
-This repo provides an extensive introduction to **Python**, R, Excel, SaS computing environments **and key libraries for large-scale data analysis and optimization problems, exploiting Data Science applications.**
+This repo provides an extensive introduction to machine learning algorithms, as well as **Python**, R, Excel, SaS computing environments **and key libraries for large-scale data analysis and optimization problems, exploiting Data Science applications.**
 
 The weekly labs and projects train us on developing machine learning algorithms for a number of cases, such as **regression, classification and clustering techniques for big data**.
 
